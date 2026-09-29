@@ -1,10 +1,12 @@
 {
-  "name": "blog.onixbyte.com",
+  "name": "opensource.onixbyte.com",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "rspress build",
+    "build:com": "rspress build --config rspress.config.ts",
+    "build:cn": "rspress build --config rspress.cn.config.ts",
     "dev": "rspress dev",
     "format": "prettier --write .",
     "lint": "eslint .",
@@ -15,6 +17,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@mdx-js/react": "3.1.1",
+    "@rspress/plugin-sitemap": "2.0.11",
     "@tailwindcss/postcss": "^4.3.0",
     "@types/node": "^22.8.1",
     "@types/react": "^19.2.14",
@@ -25,6 +29,7 @@
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "tailwindcss": "^4.3.0",
+    "typescript": "6.0.3",
     "typescript-eslint": "^8.58.1"
   }
 }

@@ -10,7 +10,7 @@
           "value": "CN"
         }
       ],
-      "destination": "https://onixbyte.cn/:path*",
+      "destination": "https://opensource.onixbyte.cn/:path*",
       "permanent": false
     }
   ]

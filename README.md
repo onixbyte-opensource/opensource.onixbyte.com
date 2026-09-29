@@ -8,10 +8,10 @@ A static documentation site built with [Rspress](https://rspress.dev/), supporti
 
 ## URLs
 
-| Domain                                           | Recommended For                |
-|--------------------------------------------------|--------------------------------|
-| [onixbyte.cn](https://onixbyte.cn)               | Users in China mainland        |
-| [onixbyte.com](https://onixbyte.com)             | Users outside China mainland   |
+| Domain                                                     | Recommended For              |
+|------------------------------------------------------------|------------------------------|
+| [opensource.onixbyte.cn](https://opensource.onixbyte.cn)   | Users in China mainland      |
+| [opensource.onixbyte.com](https://opensource.onixbyte.com) | Users outside China mainland |
 
 ## Local Development
 
