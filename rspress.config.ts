@@ -138,11 +138,18 @@ function bareRoutePath(localePrefix: (lang: string) => string, routePath: string
  *
  * It cannot live in `docs/public/`, because a single static file would have to
  * carry the wrong origin for one of the two targets.
+ *
+ * Rspress also runs `afterBuild` in dev, after each recompile. Dev never creates
+ * the output directory, so the write would fail with `ENOENT` — hence the
+ * `isProd` guard, which comes from the hook rather than `NODE_ENV`.
  */
 function pluginRobots(origin: string): RspressPlugin {
   return {
     name: "plugin-onixbyte-robots",
-    async afterBuild(config: UserConfig) {
+    async afterBuild(config: UserConfig, isProd: boolean) {
+      if (!isProd) {
+        return
+      }
       const outDir = path.resolve(process.cwd(), config.outDir ?? "doc_build")
       const body = ["User-agent: *", "Allow: /", "", `Sitemap: ${origin}/sitemap.xml`, ""].join(
         "\n"

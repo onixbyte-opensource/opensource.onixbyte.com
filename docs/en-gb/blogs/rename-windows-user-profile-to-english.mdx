@@ -1,0 +1,185 @@
+---
+title: Renaming a Windows User Account and Profile Folder to English
+tags:
+  - windows
+  - user-profile
+  - registry
+  - troubleshooting
+author:
+  name: Zihlu Wang
+  email: real@zihluwang.me
+---
+
+import { Kbd } from "@rspress/core/theme"
+
+Windows works perfectly well with a Chinese username, but it makes life needlessly difficult for a good many developer tools — the most glaring example being [a JetBrains IDE that keeps asking for a password when cloning over SSH](./jetbrains-git-ssh-clone-password-prompt.md). The culprit is the non-ASCII characters in `C:\Users\张三`: Git, Node, Python, Docker and a host of CLI tools each read that path with their own idea of the correct encoding, and sooner or later one of them gets it wrong.
+
+Renaming the account to English sorts this whole class of problem out in one go. The procedure is not complicated, but it is sensitive to the **order of the steps** and to **when you restart**, so follow along below.
+
+:::warning Before you start
+
+This procedure edits the **registry** and renames a **user profile folder**, so it carries real risk. Before you begin:
+
+- Back up important data (the desktop, your documents, and the configuration directories of any applications you rely on);
+- Make sure the account you are using has **administrator** rights;
+- Create a system restore point first, so that you can roll back if something goes wrong midway;
+- Follow the steps below in order — do not skip any, and pay particular attention to the timing of the restarts.
+
+:::
+
+## The general idea
+
+The word "username" on Windows actually covers two separate things:
+
+1. **The account's display name** — the name shown on the sign-in screen and in the Start menu;
+2. **The user profile folder name** — the `C:\Users\<name>` folder.
+
+The awkward part is that Windows will not let you rename the profile folder of a user who is signed in; and since the registry records the **absolute path** of that folder, renaming the folder without touching the registry means your profile cannot be mounted the next time you sign in.
+
+So a "go-between" account is needed to do the work:
+
+> Create a temporary account → sign in as it → rename the folder → edit the registry → return to your own account.
+
+## 1. Find the SID of the existing account
+
+Sign in as your current account (the one with the Chinese name) and open PowerShell or Command Prompt:
+
+```powershell
+whoami /user
+```
+
+The output looks like this:
+
+```text
+User information
+----------------
+User Name         SID
+================= ============================================
+desktop-abc\张三  S-1-5-21-1234567890-1234567890-1234567890-1001
+```
+
+Note the string at the end, `S-1-5-21-...-1001`. That is the `{old user SID}` you will need later.
+
+To list every local account and its SID in one go:
+
+```powershell
+wmic useraccount get name,sid
+
+# or, on more recent versions of PowerShell:
+Get-LocalUser | Select-Object Name, SID
+```
+
+## 2. Create a new local Windows account
+
+Open `Settings → Accounts → Other users → Add account`. When asked how the person will sign in, choose **"I don't have this person's sign-in information"**, then **"Add a user without a Microsoft account"**, and create a local account with a plain English name such as `tempadmin`.
+
+When it has been created, select it in the Other users list, choose **Change account type**, and make it an **administrator**.
+
+This account is purely a go-between. Its purpose is to let you work on your own profile's files and registry entries **while your own account is signed out**.
+
+## 3. Sign out of your account and sign in as the new one
+
+Save your work, sign out of your current account, restart the computer, and sign in with the temporary account you have just created.
+
+## 4. Rename the profile folder
+
+Still signed in as the temporary account, open **File Explorer**, go to `C:\Users`, and rename `张三` to the English name you want (for example `JohnDoe`):
+
+```text
+C:\Users\张三  →  C:\Users\JohnDoe
+```
+
+If Windows complains that the folder is in use, some process belonging to your original account is still running (a background service, a sync client, a resident utility). A full restart usually clears it; alternatively, rename it from the command line:
+
+```powershell
+Rename-Item -Path "C:\Users\张三" -NewName "JohnDoe"
+```
+
+:::tip Naming advice
+Stick to letters and digits, and avoid spaces. `C:\Users\zhang san` does work, but the space will cause trouble with some command-line tools all the same.
+:::
+
+## 5. Update ProfileImagePath in the registry
+
+Press <Kbd>Win</Kbd> + <Kbd>R</Kbd>, type `regedit` and press Enter to open the Registry Editor, then navigate to:
+
+```text
+Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\{old user SID}
+```
+
+using the SID you noted in step 1. Double-click `ProfileImagePath` in the right-hand pane and change its value from:
+
+```text
+C:\Users\张三
+```
+
+to:
+
+```text
+C:\Users\JohnDoe
+```
+
+Click OK and close the Registry Editor.
+
+:::warning This is the critical step
+If you rename the folder but fail to update the registry — or update it incorrectly — your next sign-in will land you in a **temporary profile**: an empty desktop, empty Documents, as though all your data had vanished. It has not; it is still sitting in `C:\Users\JohnDoe`. Go back and check that the SID and `ProfileImagePath` agree, and the profile will mount again.
+
+Also, if you find two entries under `ProfileList` sharing the same SID, one of them suffixed with `.bak`, that means a profile failed to load at some point. Make sure the correct entry (the one without `.bak`) points at the new folder, then tidy away the duplicate.
+:::
+
+## 6. Sign out of the temporary account and restart
+
+Sign out of the temporary account once more, then restart the computer.
+
+## 7. Sign back in and let Windows repair the profile
+
+Sign in with **your original account** (the name on the sign-in screen may still be Chinese; that is dealt with in step 9). As it signs in, Windows detects that the profile path has changed and repairs the profile automatically. You may see messages such as "Getting Windows ready" — wait patiently until it finishes.
+
+Once you are in, check two things:
+
+- `C:\Users\JohnDoe` is your profile folder, and your desktop, documents and other personal files are all present;
+- Open Command Prompt or PowerShell and run `echo %USERPROFILE%`. It should print `C:\Users\JohnDoe`.
+
+## 8. Fix the paths in the system environment variables
+
+Right-click `This PC → Properties → Advanced system settings → Environment Variables`, then go through both the **System variables** and the **User variables**, changing every entry that hard-codes the old path from `C:\Users\张三\...` to `C:\Users\JohnDoe\...`.
+
+Note the distinction:
+
+- Entries written as `%USERPROFILE%\AppData\...` need **no change** — they are expanded at run time and follow the new folder automatically;
+- Only **hard-coded absolute paths** need editing, for example `C:\Users\张三\scoop\shims` or `C:\Users\张三\AppData\Local\Programs\Python\Python312`;
+- `TEMP` and `TMP` are usually of the form `%USERPROFILE%\AppData\Local\Temp` and generally need nothing done to them.
+
+## 9. Change the account's display name
+
+Press <Kbd>Win</Kbd> + <Kbd>R</Kbd>, type `control userpasswords2` and press Enter. Select your original account in the list, click **Properties**, change the user name to the new English one, and click OK.
+
+This step only affects the sign-in screen and the name shown in the interface. It does not change the SID, and it has no bearing on the folder you have already renamed.
+
+## 10. Remove the temporary account (optional)
+
+Once you are satisfied that everything works, and that you can still sign in after a restart, delete the go-between account: go to `Settings → Accounts → Other users`, select it, choose **Remove**, then delete the `C:\Users\tempadmin` folder.
+
+:::tip
+Restart once and confirm that everything is in order before deleting it, so that you are not left needing the temporary account after it has gone.
+:::
+
+## Afterwards: some applications may need reinstalling
+
+Once the username — and hence the profile folder — changes, any application that has **absolute paths written into its configuration, services, scheduled tasks or shortcuts** may fail to start, or may lose its settings. The usual suspects:
+
+- **Package managers and runtimes** — Scoop, Chocolatey, Anaconda, nvm, and globally installed Node or Python packages, whose shims and configuration files tend to contain the old path;
+- **Development tools** — the JetBrains IDEs (whose configuration and cache live under the old path), Docker Desktop, WSL distributions, and Git's global configuration and credential store;
+- **Anything registered as a Windows service** — databases, web servers and the like, where the service definition pins the absolute paths of the executable and its data directory;
+- **Desktop shortcuts and the "recently used" lists** — these may all stop working;
+- **Cloud storage and sync clients** — these will need pointing at the new folder again.
+
+When that happens, **uninstalling and reinstalling** is usually the least painful and most reliable remedy; a few applications can be put right by re-pointing the paths or running a repair install. It is worth opening each of your everyday development tools after the rename and checking them one by one, reinstalling whatever misbehaves.
+
+## Summary
+
+Renaming a Windows username — and in particular the profile folder — is a "pain once, relief for a long time" operation. The process itself is not complicated, but it is sensitive to the order of the steps and the timing of the restarts. Follow the sequence strictly — note the SID, create a temporary account, rename the folder, edit the registry, then come back to fix the environment variables and the display name — and it will go smoothly.
+
+And once it is done, problems of the kind described in [JetBrains IDE Prompting for the Git User's Password When Cloning over SSH](./jetbrains-git-ssh-clone-password-prompt.md), caused by non-ASCII paths, disappear along with them.
+
+> Reproduced from a video by Douyin user **@90后科技说**, originally at [https://v.douyin.com/2hqIZUsG9YM/](https://v.douyin.com/2hqIZUsG9YM/).
