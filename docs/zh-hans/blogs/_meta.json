@@ -1,0 +1,134 @@
+[
+  {
+    "type": "file",
+    "name": "index"
+  },
+  {
+    "type": "section-header",
+    "label": "前端"
+  },
+  {
+    "type": "file",
+    "name": "ecmascript-2025-syntax-sugar"
+  },
+  {
+    "type": "file",
+    "name": "font-size-conversion-table"
+  },
+  {
+    "type": "file",
+    "name": "frontend-tips-and-solutions"
+  },
+  {
+    "type": "section-header",
+    "label": "后端与数据库"
+  },
+  {
+    "type": "file",
+    "name": "java-development-cheatsheet"
+  },
+  {
+    "type": "file",
+    "name": "mybatis-flex"
+  },
+  {
+    "type": "file",
+    "name": "postgresql-zhparser-fuzzy-search"
+  },
+  {
+    "type": "file",
+    "name": "use-json-in-mysql"
+  },
+  {
+    "type": "file",
+    "name": "use-of-gravatar"
+  },
+  {
+    "type": "section-header",
+    "label": "DevOps 与基础设施"
+  },
+  {
+    "type": "file",
+    "name": "docker-deployment-standards"
+  },
+  {
+    "type": "file",
+    "name": "gitlab-ops"
+  },
+  {
+    "type": "file",
+    "name": "minio-admin-guide"
+  },
+  {
+    "type": "file",
+    "name": "setup-ldap-service"
+  },
+  {
+    "type": "section-header",
+    "label": "工程规范"
+  },
+  {
+    "type": "file",
+    "name": "frontend-development-standards"
+  },
+  {
+    "type": "file",
+    "name": "general-development-standards"
+  },
+  {
+    "type": "file",
+    "name": "google-code-review-standards"
+  },
+  {
+    "type": "file",
+    "name": "java-development-standards"
+  },
+  {
+    "type": "file",
+    "name": "version-control-and-code-review"
+  },
+  {
+    "type": "section-header",
+    "label": "工具与效率"
+  },
+  {
+    "type": "file",
+    "name": "cooking-seasoning-guide"
+  },
+  {
+    "type": "file",
+    "name": "email-like-a-boss"
+  },
+  {
+    "type": "file",
+    "name": "fix-idea-application-yaml-schema-validation"
+  },
+  {
+    "type": "file",
+    "name": "fix-macos-monterey-sleep-wake"
+  },
+  {
+    "type": "file",
+    "name": "git-cheatsheet"
+  },
+  {
+    "type": "file",
+    "name": "jetbrains-git-ssh-clone-password-prompt"
+  },
+  {
+    "type": "file",
+    "name": "macos-private-dns-hostname"
+  },
+  {
+    "type": "file",
+    "name": "quartile-method"
+  },
+  {
+    "type": "file",
+    "name": "rename-windows-user-profile-to-english"
+  },
+  {
+    "type": "file",
+    "name": "windows-driver-backup-restore"
+  }
+]

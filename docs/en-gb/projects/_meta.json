@@ -1,0 +1,58 @@
+[
+  {
+    "type": "file",
+    "name": "index"
+  },
+  {
+    "type": "section-header",
+    "label": "Libraries & Toolkits"
+  },
+  {
+    "type": "dir",
+    "name": "onixbyte-toolbox",
+    "label": "OnixByte Toolbox"
+  },
+  {
+    "type": "file",
+    "name": "regions4j/index",
+    "label": "Regions for Java"
+  },
+  {
+    "type": "dir",
+    "name": "captcha",
+    "label": "Captcha"
+  },
+  {
+    "type": "dir",
+    "name": "calendar-toolbox",
+    "label": "Calendar Toolbox"
+  },
+  {
+    "type": "section-header",
+    "label": "Full-Stack Applications"
+  },
+  {
+    "type": "file",
+    "name": "helix/index",
+    "label": "Helix"
+  },
+  {
+    "type": "dir",
+    "name": "delta-force-guide",
+    "label": "Delta Force Guide"
+  },
+  {
+    "type": "section-header",
+    "label": "Developer Tools"
+  },
+  {
+    "type": "file",
+    "name": "claude-code-skill-manager/index",
+    "label": "Claude Code Skills Manager"
+  },
+  {
+    "type": "dir",
+    "name": "vite-plugins",
+    "label": "Vite Plugins"
+  }
+]
